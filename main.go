@@ -22,9 +22,6 @@ import (
 	"github.com/goki/freetype/truetype"
 )
 
-const leftMargin = 10
-const topMargin = 10
-
 func main() {
 	flag.Parse()
 
@@ -65,7 +62,7 @@ func main() {
 	scanner := bufio.NewScanner(f)
 	count := topMargin + 32
 	for scanner.Scan() {
-		dc.DrawString(scanner.Text(), leftMargin, float64(topMargin+count))
+		dc.DrawString(scanner.Text(), float64(leftMargin), float64(topMargin+count))
 		count += 32
 	}
 
@@ -157,8 +154,12 @@ var output string
 var canvasWidth int
 var canvasHeight int
 var resizePercent float64
+var leftMargin int
+var topMargin int
 
 func init() {
+	flag.IntVar(&leftMargin, "margin-left", 10, "Text left margin")
+	flag.IntVar(&topMargin, "margin-top", 10, "Text top margin")
 	flag.IntVar(&canvasWidth, "width", 1024, "Canvas width")
 	flag.IntVar(&canvasHeight, "height", 400, "Canvas height")
 	flag.Float64Var(&resizePercent, "resize", 1.0, "Resoize percent")
