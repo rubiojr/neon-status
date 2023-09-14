@@ -17,6 +17,7 @@ import (
 
 	"github.com/anthonynsimon/bild/blur"
 	"github.com/anthonynsimon/bild/effect"
+	"github.com/disintegration/imaging"
 	"github.com/fogleman/gg"
 	"github.com/goki/freetype/truetype"
 )
@@ -88,6 +89,14 @@ func main() {
 	dc.DrawImage(original, 10, 10)
 
 	dc.SavePNG(output)
+	if resizePercent != 1.0 {
+		targetWidth := resizePercent * float64(canvasWidth)
+		err = resizeOutput(output, int(targetWidth))
+		if err != nil {
+			fmt.Println("Error resizing output file")
+			os.Exit(1)
+		}
+	}
 }
 
 func Bloom(img image.Image) image.Image {
@@ -102,6 +111,15 @@ func Bloom(img image.Image) image.Image {
 	bloomed := blur.Gaussian(dilated, 50.0)
 
 	return bloomed
+}
+
+func resizeOutput(output string, width int) error {
+	src, err := imaging.Open(output)
+	if err != nil {
+		return err
+	}
+	rc := imaging.Resize(src, width, 0, imaging.Lanczos)
+	return imaging.Save(rc, output)
 }
 
 func translateImage(src image.Image, bounds image.Rectangle, xOffset, yOffset int) image.Image {
@@ -138,10 +156,12 @@ var rgb string
 var output string
 var canvasWidth int
 var canvasHeight int
+var resizePercent float64
 
 func init() {
 	flag.IntVar(&canvasWidth, "width", 1024, "Canvas width")
 	flag.IntVar(&canvasHeight, "height", 400, "Canvas height")
+	flag.Float64Var(&resizePercent, "resize", 1.0, "Resoize percent")
 	flag.StringVar(&output, "output", "output.png", "PNG file to write")
 	flag.StringVar(&file, "file", "", "file with the text to render")
 	flag.StringVar(&rgb, "rgb", "178,0,255", "the RGB color to use")

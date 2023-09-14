@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/anthonynsimon/bild v0.13.0
+	github.com/disintegration/imaging v1.6.2
 	github.com/fogleman/gg v1.3.1-0.20210928143535-8febc0f526ad
 	github.com/goki/freetype v1.0.1
 )
