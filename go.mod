@@ -1,6 +1,6 @@
 module github.com/rubiojr/neon-status
 
-go 1.21rc4
+go 1.20
 
 require (
 	github.com/anthonynsimon/bild v0.13.0
