@@ -55,12 +55,12 @@ func main() {
 
 	f, err := os.Open(input)
 	if err != nil {
-		fmt.Println("Error opening input file")
-		os.Exit(1)
+		exitOnError(fmt.Errorf("could not open input file: %v", err))
 	}
 
-	face := truetype.NewFace(font, &truetype.Options{Size: 48})
+	face := truetype.NewFace(font, &truetype.Options{Size: fontSize})
 	dc := gg.NewContext(canvasWidth, canvasHeight)
+
 	dc.SetLineWidth(3.0)
 	parsedRGB := parseColor(rgb)
 	dc.SetRGB255(parsedRGB[0], parsedRGB[1], parsedRGB[2])
@@ -74,7 +74,7 @@ func main() {
 	}
 
 	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
+		exitOnError(fmt.Errorf("error reading input file: %v", err))
 	}
 
 	dc.Stroke()
@@ -88,18 +88,23 @@ func main() {
 	dc.DrawRectangle(0, 0, float64(canvasWidth), float64(canvasHeight))
 	dc.Fill()
 
+	if bgImage != "" {
+		im, err := gg.LoadJPG(bgImage)
+		exitOnError(err)
+		dc.DrawImage(im, 0, 0)
+	}
+
 	dc.DrawImage(bloomed, 0, 0)
 
 	dc.DrawImage(original, 10, 10)
 
-	dc.SavePNG(output)
+	err = dc.SavePNG(output)
+	exitOnError(err)
+
 	if resizePercent != 1.0 {
 		targetWidth := resizePercent * float64(canvasWidth)
 		err = resizeOutput(output, int(targetWidth))
-		if err != nil {
-			fmt.Println("Error resizing output file")
-			os.Exit(1)
-		}
+		exitOnError(fmt.Errorf("error resizing output file: %v", err))
 	}
 }
 
@@ -166,9 +171,19 @@ var topMargin int
 var font string
 var bloomDilate float64
 var bloomGaussian float64
+var fontSize float64
+var bgImage string
+
+func exitOnError(err error) {
+	if err != nil {
+		fmt.Sprintf("Error: %v\n", err)
+		os.Exit(1)
+	}
+}
 
 func init() {
 	flag.StringVar(&font, "font", "", "Font file to use")
+	flag.StringVar(&bgImage, "bg-image", "", "Background image to use")
 	flag.IntVar(&leftMargin, "margin-left", 10, "Text left margin")
 	flag.IntVar(&topMargin, "margin-top", 10, "Text top margin")
 	flag.IntVar(&canvasWidth, "width", 1024, "Canvas width")
@@ -176,6 +191,7 @@ func init() {
 	flag.Float64Var(&resizePercent, "resize", 1.0, "Resoize percent")
 	flag.Float64Var(&bloomDilate, "bloom-dilate", 0.5, "Tune font dilation effect")
 	flag.Float64Var(&bloomGaussian, "bloom-gaussian", 10, "Tune font gaussian effect")
+	flag.Float64Var(&fontSize, "font-size", 48, "Tune font gaussian effect")
 	flag.StringVar(&output, "output", "output.png", "PNG file to write")
 	flag.StringVar(&file, "file", "", "file with the text to render")
 	flag.StringVar(&rgb, "rgb", "178,0,255", "the RGB color to use")

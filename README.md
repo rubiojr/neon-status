@@ -1,6 +1,7 @@
 ## Neon Text Generator
 
 ![](sample.png)
+<sub>©Black River Tavern - All Rights Reserved<sub>
 
 
 ```
@@ -8,5 +9,12 @@ go install github.com/rubiojr/neon-status@latest
 ```
 
 ```
-neon-status -rgb "178,0,255" --width 1024 --height 300 --output sample.png sample.txt
+neon-status --bloom-dilate 1 \
+            -margin-left 100 \
+            -margin-top 100 \
+            --width 1920 \
+            --height 1080 \
+            --font-size 96 \
+            --bg-image blackrivertavern.jpg \
+            --output output.png sample.txt
 ```
