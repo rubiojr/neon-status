@@ -25,20 +25,28 @@ import (
 func main() {
 	flag.Parse()
 
-	//	if len(os.Args) < 2 {
-	//		fmt.Println("Usage: neon-status <input-file>")
-	//		fmt.Println("Please provide a text file as input")
-	//		os.Exit(1)
-	//	}
-	input := flag.Args()[0]
-
-	b, err := ioutil.ReadFile("fonts/Sportrop.ttf")
-	if err != nil {
-		fmt.Println("Error reading font file")
+	if flag.NArg() != 1 {
+		fmt.Println("Please specify source file.\n")
+		flag.Usage()
 		os.Exit(1)
 	}
 
-	font, err := truetype.Parse(b)
+	input := flag.Args()[0]
+
+	var fb []byte
+	var err error
+
+	if font == "" {
+		fb, err = ioutil.ReadFile("fonts/Sportrop.ttf")
+	} else {
+		fb, err = ioutil.ReadFile(font)
+	}
+	if err != nil {
+		fmt.Println("Error reading font file.")
+		os.Exit(1)
+	}
+
+	font, err := truetype.Parse(fb)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -103,9 +111,9 @@ func Bloom(img image.Image) image.Image {
 	var extended image.Image
 	extended = translateImage(img, newSize, 10, 10)
 
-	dilated := effect.Dilate(extended, 1)
+	dilated := effect.Dilate(extended, 0.5)
 
-	bloomed := blur.Gaussian(dilated, 50.0)
+	bloomed := blur.Gaussian(dilated, 10.0)
 
 	return bloomed
 }
@@ -156,8 +164,10 @@ var canvasHeight int
 var resizePercent float64
 var leftMargin int
 var topMargin int
+var font string
 
 func init() {
+	flag.StringVar(&font, "font", "", "Font file to use")
 	flag.IntVar(&leftMargin, "margin-left", 10, "Text left margin")
 	flag.IntVar(&topMargin, "margin-top", 10, "Text top margin")
 	flag.IntVar(&canvasWidth, "width", 1024, "Canvas width")
