@@ -111,9 +111,9 @@ func Bloom(img image.Image) image.Image {
 	var extended image.Image
 	extended = translateImage(img, newSize, 10, 10)
 
-	dilated := effect.Dilate(extended, 0.5)
+	dilated := effect.Dilate(extended, bloomDilate)
 
-	bloomed := blur.Gaussian(dilated, 10.0)
+	bloomed := blur.Gaussian(dilated, bloomGaussian)
 
 	return bloomed
 }
@@ -165,6 +165,8 @@ var resizePercent float64
 var leftMargin int
 var topMargin int
 var font string
+var bloomDilate float64
+var bloomGaussian float64
 
 func init() {
 	flag.StringVar(&font, "font", "", "Font file to use")
@@ -173,6 +175,8 @@ func init() {
 	flag.IntVar(&canvasWidth, "width", 1024, "Canvas width")
 	flag.IntVar(&canvasHeight, "height", 400, "Canvas height")
 	flag.Float64Var(&resizePercent, "resize", 1.0, "Resoize percent")
+	flag.Float64Var(&bloomDilate, "bloom-dilate", 0.5, "Tune font dilation effect")
+	flag.Float64Var(&bloomGaussian, "bloom-gaussian", 10, "Tune font gaussian effect")
 	flag.StringVar(&output, "output", "output.png", "PNG file to write")
 	flag.StringVar(&file, "file", "", "file with the text to render")
 	flag.StringVar(&rgb, "rgb", "178,0,255", "the RGB color to use")
