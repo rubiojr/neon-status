@@ -69,7 +69,7 @@ func main() {
 	scanner := bufio.NewScanner(f)
 	count := topMargin + 32
 	for scanner.Scan() {
-		dc.DrawString(scanner.Text(), float64(leftMargin), float64(topMargin+count))
+		drawString(dc, scanner.Text(), count)
 		count += 32
 	}
 
@@ -173,11 +173,31 @@ var bloomDilate float64
 var bloomGaussian float64
 var fontSize float64
 var bgImage string
+var textAlign string
 
 func exitOnError(err error) {
 	if err != nil {
 		fmt.Sprintf("Error: %v\n", err)
 		os.Exit(1)
+	}
+}
+
+func drawString(dc *gg.Context, text string, count int) {
+	if textAlign != "" {
+		var textAlignV float64
+		switch textAlign {
+		case "center":
+			textAlignV = 0.5
+		case "right":
+			textAlignV = 1.0
+		case "left":
+			textAlignV = 0
+		default:
+			exitOnError(fmt.Errorf("invalid text alignment: %v", textAlign))
+		}
+		dc.DrawStringAnchored(text, float64(leftMargin), float64(topMargin+count), textAlignV, textAlignV)
+	} else {
+		dc.DrawString(text, float64(leftMargin), float64(topMargin+count))
 	}
 }
 
@@ -195,4 +215,5 @@ func init() {
 	flag.StringVar(&output, "output", "output.png", "PNG file to write")
 	flag.StringVar(&file, "file", "", "file with the text to render")
 	flag.StringVar(&rgb, "rgb", "178,0,255", "the RGB color to use")
+	flag.StringVar(&textAlign, "text-align", "", "Align the text (left, center, right)")
 }

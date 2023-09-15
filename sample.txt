@@ -1,4 +1,4 @@
-  All
+All
 
 
 
@@ -7,15 +7,14 @@ Beverages
 
 
 
-  Are
+Are
 
 
 
 
- Served
+Served
 
 
 
 
-  Cold
-
+Cold

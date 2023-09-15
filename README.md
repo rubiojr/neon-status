@@ -10,8 +10,9 @@ go install github.com/rubiojr/neon-status@latest
 
 ```
 neon-status --bloom-dilate 1 \
-            -margin-left 100 \
-            -margin-top 100 \
+            -text-align center \
+            -margin-left 350 \
+            -margin-top 80 \
             --width 1920 \
             --height 1080 \
             --font-size 96 \
