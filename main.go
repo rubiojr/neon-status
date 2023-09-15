@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -89,7 +90,15 @@ func main() {
 	dc.Fill()
 
 	if bgImage != "" {
-		im, err := gg.LoadJPG(bgImage)
+		var im image.Image
+		switch filepath.Ext(bgImage) {
+		case ".jpg", ".jpeg":
+			im, err = gg.LoadJPG(bgImage)
+		case ".png":
+			im, err = gg.LoadPNG(bgImage)
+		default:
+			err = fmt.Errorf("unsupported image type: %s", filepath.Ext(bgImage))
+		}
 		exitOnError(err)
 		dc.DrawImage(im, 0, 0)
 	}
