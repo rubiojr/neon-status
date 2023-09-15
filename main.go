@@ -15,12 +15,17 @@ import (
 	"strconv"
 	"strings"
 
+	_ "embed"
+
 	"github.com/anthonynsimon/bild/blur"
 	"github.com/anthonynsimon/bild/effect"
 	"github.com/disintegration/imaging"
 	"github.com/fogleman/gg"
 	"github.com/goki/freetype/truetype"
 )
+
+//go:embed fonts/Sportrop.ttf
+var defaultFont []byte
 
 func main() {
 	flag.Parse()
@@ -33,20 +38,17 @@ func main() {
 
 	input := flag.Args()[0]
 
-	var fb []byte
 	var err error
 
-	if font == "" {
-		fb, err = ioutil.ReadFile("fonts/Sportrop.ttf")
-	} else {
-		fb, err = ioutil.ReadFile(font)
+	if font != "" {
+		defaultFont, err = ioutil.ReadFile(font)
 	}
 	if err != nil {
 		fmt.Println("Error reading font file.")
 		os.Exit(1)
 	}
 
-	font, err := truetype.Parse(fb)
+	font, err := truetype.Parse(defaultFont)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -60,9 +62,6 @@ func main() {
 	face := truetype.NewFace(font, &truetype.Options{Size: 48})
 	dc := gg.NewContext(canvasWidth, canvasHeight)
 	dc.SetLineWidth(3.0)
-	//dc.SetRGB255(147, 112, 219)
-	//dc.SetRGB255(178, 0, 255)
-	//dc.SetRGB255(255, 0, 0)
 	parsedRGB := parseColor(rgb)
 	dc.SetRGB255(parsedRGB[0], parsedRGB[1], parsedRGB[2])
 	dc.SetFontFace(face)
